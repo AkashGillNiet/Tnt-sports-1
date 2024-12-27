@@ -112,6 +112,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/plugins/clappr.dash.min.js"></script>
   <script>
     // Define the stream URL for the DASH stream
     const streamUrl = "https://ottb.live.cf.ww.aiv-cdn.net/lhr-nitro/live/clients/dash/enc/wf8usag51e/out/v1/bd3b0c314fff4bb1ab4693358f3cd2d3/cenc.mpd";
@@ -132,6 +133,7 @@
         seekbar: "#FFF",
         buttons: "#FFF",
       },
+      plugins: [Clappr.Dash], // Enable the Dash plugin
     });
 
     // Handle quality selection
