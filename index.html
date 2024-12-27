@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Niet EnterSports</title>
-  <link href="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.css" rel="stylesheet">
   <style>
     body {
       margin: 0;
@@ -83,6 +82,7 @@
       font-size: 16px;
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
 </head>
 <body>
   <div class="video-container">
@@ -91,7 +91,7 @@
       <img src="https://raw.githubusercontent.com/AkashGillNiet/TNT3/refs/heads/main/nes.png" alt="Logo">
     </div>
     <div class="quality-select">
-      <select id="quality">
+      <select id="quality-select">
         <option value="auto">Auto</option>
         <option value="144">144p</option>
         <option value="240">240p</option>
@@ -102,7 +102,6 @@
       </select>
     </div>
   </div>
-
   <div class="popup" id="popup">
     <div class="popup-content">
       <h2>Join our Telegram Channel</h2>
@@ -111,15 +110,33 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/plugins/clappr.dash.min.js"></script>
+  <!-- Scattered Parts of the Streaming URL with Token -->
   <script>
-    // Define the stream URL for the DASH stream
-    const streamUrl = "https://ottb.live.cf.ww.aiv-cdn.net/lhr-nitro/live/clients/dash/enc/wf8usag51e/out/v1/bd3b0c314fff4bb1ab4693358f3cd2d3/cenc.mpd";
+    const base1 = "https://";
+    const base2 = "puc2.mylife1.top:8088";
+    const path1 = "/mobile";
+    const path2 = "/stream1_160p";
+    const file = "/playlist.m3u8";
+    const query1 = "?vidictid=200847280872";
+    const query2 = "&id=5";
+    const query3 = "&pk=6960044d4f967ec82c495eb0cee2124edff7004cc544053b9c84a551711353a83113c88630f05912abf41deb2ba939c70be01272947168925f8443332b77e591";
+    const token = generateToken();  // A function to generate a secure token
 
-    // Initialize Clappr Player for DASH stream
+    function generateToken() {
+      // Example: Using the current time and some secret key to generate a token
+      const secretKey = "s3cr3t_key";
+      const timestamp = Date.now();
+      const rawToken = `${timestamp}:${secretKey}`;
+      return btoa(rawToken);  // Base64 encode the token
+    }
+
+    function getStreamUrl() {
+      return `${base1}${base2}${path1}${path2}${file}${query1}${query2}${query3}&token=${token}`;
+    }
+
+    // Initialize Clappr Player with the reconstructed URL
     const player = new Clappr.Player({
-      source: streamUrl,
+      source: getStreamUrl(),
       parentId: "#video-player",
       autoPlay: true,
       height: "100%",
@@ -133,47 +150,43 @@
         seekbar: "#FFF",
         buttons: "#FFF",
       },
-      plugins: [Clappr.Dash], // Enable the Dash plugin
     });
 
     // Handle quality selection
-    const qualitySelect = document.getElementById("quality");
+    const qualitySelect = document.getElementById("quality-select");
     qualitySelect.addEventListener("change", (event) => {
       const selectedQuality = event.target.value;
 
       if (selectedQuality === "auto") {
-        // Reset to auto quality handling
-        player.configure({ playback: { quality: 'auto' } });
+        player.configure({ abr: { enabled: true } }); // Enable auto quality
       } else {
-        // Adjust the quality if the option is selected
-        player.configure({ playback: { quality: selectedQuality } });
+        player.configure({ abr: { enabled: false } }); // Disable auto quality
+        const resolutionMap = {
+          144: "stream2_144p/playlist.m3u8",
+          240: "stream2_240p/playlist.m3u8",
+          360: "stream2_360p/playlist.m3u8",
+          480: "stream2_480p/playlist.m3u8",
+          720: "stream2_720p/playlist.m3u8",
+          1080: "stream2_1080p/playlist.m3u8",
+        };
+        const newSource = `${base1}${base2}${path1}/${resolutionMap[selectedQuality]}?token=${token}`;
+        player.load(newSource);
       }
     });
 
-    // Sniffer detection: Check for any sniffers and display a message
-    function detectSniffer() {
-      const isSnifferDetected = /curl|wget|httpclient|postman|python-requests/i.test(navigator.userAgent);
-      if (isSnifferDetected) {
-        alert('Sniffer detected. Access restricted.');
-        window.location.href = "about:blank"; // Redirect to a blank page
-      }
-    }
-
-    // Call sniffer detection on page load
-    detectSniffer();
-
     // Show popup on load
-    window.onload = function() {
-      document.getElementById('popup').style.display = 'flex';
+    window.onload = function () {
+      document.getElementById("popup").style.display = "flex";
     };
 
-    document.getElementById('join-now').onclick = function() {
-      window.open('https://t.me/SportsLiveLink18', '_blank');
-      document.getElementById('popup').style.display = 'none';
+    // Popup button handlers
+    document.getElementById("join-now").onclick = function () {
+      window.open("https://t.me/SportsLiveLink18", "_blank");
+      document.getElementById("popup").style.display = "none";
     };
 
-    document.getElementById('already-joined').onclick = function() {
-      document.getElementById('popup').style.display = 'none';
+    document.getElementById("already-joined").onclick = function () {
+      document.getElementById("popup").style.display = "none";
     };
   </script>
 </body>
