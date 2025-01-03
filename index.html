@@ -1,193 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Niet EnterSports</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background: #000;
-      height: 100%;
-    }
-    .video-container {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    #video-player {
-      width: 100%;
-      height: 100%;
-    }
-    .logo {
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 10;
-    }
-    .logo img {
-      width: 100px;
-      height: auto;
-    }
-    .quality-select {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      z-index: 15;
-    }
-    .quality-select select {
-      background-color: #2c2c2c;
-      color: #fff;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 5px;
-      font-size: 14px;
-      cursor: pointer;
-    }
-    .popup {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(5px);
-      display: none;
-      z-index: 20;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-    }
-    .popup-content {
-      background-color: #2c2c2c;
-      color: #fff;
-      padding: 30px;
-      border-radius: 10px;
-      width: 80%;
-      max-width: 500px;
-    }
-    .popup button {
-      background-color: #6a4e23;
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      margin: 10px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-  </style>
-  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plyr Video Player</title>
+    <!-- Plyr CSS -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css">
+    <!-- Dash.js -->
+    <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
+    <!-- Plyr JS -->
+    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: black;
+        }
+        video {
+            width: 80%;
+            max-height: 80%;
+        }
+    </style>
 </head>
 <body>
-  <div class="video-container">
-    <div id="video-player"></div>
-    <div class="logo">
-      <img src="https://raw.githubusercontent.com/AkashGillNiet/TNT3/refs/heads/main/nes.png" alt="Logo">
-    </div>
-    <div class="quality-select">
-      <select id="quality-select">
-        <option value="auto">Auto</option>
-        <option value="144">144p</option>
-        <option value="240">240p</option>
-        <option value="360">360p</option>
-        <option value="480">480p</option>
-        <option value="720">720p</option>
-        <option value="1080">1080p</option>
-      </select>
-    </div>
-  </div>
-  <div class="popup" id="popup">
-    <div class="popup-content">
-      <h2>Join our Telegram Channel</h2>
-      <button id="join-now">Join Now</button>
-      <button id="already-joined">Already Joined</button>
-    </div>
-  </div>
+    <!-- Plyr Video Player -->
+    <video id="videoPlayer" class="plyr__video-embed" controls autoplay></video>
 
-  <!-- Scattered Parts of the Streaming URL with Token -->
-  <script>
-    const base1 = "https://";
-    const base2 = "puc2.mylife1.top:8088";
-    const path1 = "/mobile";
-    const path2 = "/stream1_160p";
-    const file = "/playlist.m3u8";
-    const query1 = "?vidictid=200861166167";
-    const query2 = "&id=1";
-    const query3 = "&pk=6a3d4b6e4fb556a523fff2ad100f73bdb8a87c3356ee2e2f0b250c93355e2b321a2d92121fcf003391716e481d8a90803237092398bff140f51102bb7c80e3b0";
-    const token = generateToken();  // A function to generate a secure token
+    <script>
+        // DASH.js से Plyr प्लेयर को इनिशियलाइज़ करना
+        const videoElement = document.getElementById('videoPlayer');
+        const dashPlayer = dashjs.MediaPlayer().create();
 
-    function generateToken() {
-      // Example: Using the current time and some secret key to generate a token
-      const secretKey = "s3cr3t_key";
-      const timestamp = Date.now();
-      const rawToken = `${timestamp}:${secretKey}`;
-      return btoa(rawToken);  // Base64 encode the token
-    }
-
-    function getStreamUrl() {
-      return `${base1}${base2}${path1}${path2}${file}${query1}${query2}${query3}&token=${token}`;
-    }
-
-    // Initialize Clappr Player with the reconstructed URL
-    const player = new Clappr.Player({
-      source: getStreamUrl(),
-      parentId: "#video-player",
-      autoPlay: true,
-      height: "100%",
-      width: "100%",
-      mute: false,
-      playback: {
-        playInline: true,
-        preload: "auto",
-      },
-      mediacontrol: {
-        seekbar: "#FFF",
-        buttons: "#FFF",
-      },
-    });
-
-    // Handle quality selection
-    const qualitySelect = document.getElementById("quality-select");
-    qualitySelect.addEventListener("change", (event) => {
-      const selectedQuality = event.target.value;
-
-      if (selectedQuality === "auto") {
-        player.configure({ abr: { enabled: true } }); // Enable auto quality
-      } else {
-        player.configure({ abr: { enabled: false } }); // Disable auto quality
-        const resolutionMap = {
-          144: "stream2_144p/playlist.m3u8",
-          240: "stream2_240p/playlist.m3u8",
-          360: "stream2_360p/playlist.m3u8",
-          480: "stream2_480p/playlist.m3u8",
-          720: "stream2_720p/playlist.m3u8",
-          1080: "stream2_1080p/playlist.m3u8",
+        // DASH स्ट्रीमिंग URL और DRM कुंजियाँ
+        const streamUrl = "https://ottb.live.cf.ww.aiv-cdn.net/lhr-nitro/live/clients/dash/enc/wf8usag51e/out/v1/bd3b0c314fff4bb1ab4693358f3cd2d3/cenc.mpd?|drmScheme=clearkey&drmLicense=ae26845bd33038a9c0774a0981007294:63ac662dde310cfb4cc6f9b43b34196d";
+        const drmKeys = {
+            "clearkey": {
+                "clearkeys": {
+                    "ae26845bd33038a9c0774a0981007294": "63ac662dde310cfb4cc6f9b43b34196d"
+                }
+            }
         };
-        const newSource = `${base1}${base2}${path1}/${resolutionMap[selectedQuality]}?token=${token}`;
-        player.load(newSource);
-      }
-    });
 
-    // Show popup on load
-    window.onload = function () {
-      document.getElementById("popup").style.display = "flex";
-    };
+        // DASH.js को वीडियो एलिमेंट से कनेक्ट करना
+        dashPlayer.initialize(videoElement, streamUrl, true);
+        dashPlayer.setProtectionData(drmKeys);
 
-    // Popup button handlers
-    document.getElementById("join-now").onclick = function () {
-      window.open("https://t.me/SportsLiveLink18", "_blank");
-      document.getElementById("popup").style.display = "none";
-    };
+        // Plyr प्लेयर को वीडियो एलिमेंट पर अप्लाई करना
+        const player = new Plyr(videoElement, {
+            captions: { active: true, update: true, language: 'auto' },
+            settings: ['captions', 'quality', 'speed'],
+        });
 
-    document.getElementById("already-joined").onclick = function () {
-      document.getElementById("popup").style.display = "none";
-    };
-  </script>
+        // एरर लॉगिंग
+        dashPlayer.on(dashjs.MediaPlayer.events.ERROR, function (error) {
+            console.error("DASH.js Error:", error);
+        });
+
+        console.log("Plyr Player Initialized with DASH.js");
+    </script>
 </body>
 </html>
